@@ -3,3 +3,15 @@ body {
   padding: 0;
   font-family: sans-serif;
 }
+
+.dialogBox{
+    position:fixed;
+    top:60%;
+    height:40%;
+    width:100%;
+    background-color:gray;
+}
+.dialog{
+    height:100%;
+    width:100%;
+}
