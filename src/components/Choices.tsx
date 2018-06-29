@@ -6,12 +6,12 @@ export interface ChoicesProps{
     };
 }
 
-const ChoiceOption : React.PureComponent<{target: Actions.SelectDialog}> = ({target, children})=>(
+const ChoiceOption : React.PureComponent<{target: string}> = ({target})=>(
     <p className='choice' onClick={}>
-       {children}
+       {target}
     </p>
 )
-class Choices extends React.Component <ChoicesProps>{
+export class Choices extends React.Component <ChoicesProps>{
 
     public render() {
         return (
