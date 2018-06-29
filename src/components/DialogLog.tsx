@@ -2,8 +2,7 @@ import * as React from 'react';
 import Typist from 'react-typist';
 import PropTypes from 'prop-types';
 
-
-
+//TODO: Add backspacing
 class DialogLog extends React.Component <{
     onFinish?: PropTypes.func,
 },{
@@ -12,7 +11,7 @@ class DialogLog extends React.Component <{
     state = {
         typing : true
     }
-
+    static Delay = Typist.delay;
     finishTyping = ()=>{
         this.setState({typing:false})
     }
@@ -29,12 +28,17 @@ class DialogLog extends React.Component <{
                     </div>
                 :
                     <div onClick={this.props.onFinish} className='dialog'>
-                        {this.props.children}
+                       
+                       {this.props.children}
                     </div>
                 }
             </div>
         );
     }
 }
+
+
+
+
 
 export default DialogLog;
