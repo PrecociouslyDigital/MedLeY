@@ -29,7 +29,7 @@ export const moveDialogReducer = (state: StoreState, action: Select_Dialog) : St
             currentConversation: undefined
         }
     }
-    let playerState = nextNode.data.onVisit(state.playerState);
+    let playerState = nextNode.data.onVisit==null ? state.playerState : nextNode.data.onVisit(state.playerState);
     let currentConversation = nextNode.renderDialogNode(playerState);
     return {    
         ...state,

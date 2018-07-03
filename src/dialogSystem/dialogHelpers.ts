@@ -11,7 +11,7 @@ export interface DialogOption{
     choices : (state: PlayerSave.PlayerSaveState) => {
         [key:string] : string;
     } | string | null;
-    onVisit: (state: Readonly<PlayerSave.PlayerSaveState>) => PlayerSave.PlayerSaveState;
+    onVisit?: (state: Readonly<PlayerSave.PlayerSaveState>) => PlayerSave.PlayerSaveState;
 }
 export class DialogNode{
     private parentNode : DialogNode;
@@ -94,6 +94,6 @@ export interface RenderedDialogNode {
 }
 
 export interface Message {
-    message: JSX.Element;
+    message: React.ReactNode;
     sprite: string;
 }
