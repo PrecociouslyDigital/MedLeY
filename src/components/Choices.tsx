@@ -1,5 +1,6 @@
 import * as React from 'react';
-import * as Actions from '../actions/dialogActions';
+import store from '../store/store';
+import {SELECT_DIALOG} from '../actions/dialogActions';
 export interface ChoicesProps{
     choices:{
         [key : string] : string;
@@ -7,7 +8,10 @@ export interface ChoicesProps{
 }
 
 const ChoiceOption : React.PureComponent<{target: string}> = ({target})=>(
-    <p className='choice' onClick={}>
+    <p className='choice' onClick={store.dispatch({
+        type: SELECT_DIALOG,
+        path:target
+    })}>
        {target}
     </p>
 )

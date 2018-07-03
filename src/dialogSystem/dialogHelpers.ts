@@ -1,21 +1,22 @@
 import * as PlayerSave from '../reducers/playerSave';
+import * as DialogRoot from '../dialogSystem/dialogRoot';
 
-import dialogRoot from './dialogRoot'
+
 export interface DialogOption{
     title: string;
-    messages : [Message];
+    messages : (state: Readonly<PlayerSave.PlayerSaveState>)=>Message[];
     children : {
         [key : string] : DialogNode
     };
     choices : (state: PlayerSave.PlayerSaveState) => {
         [key:string] : string;
-    } | string;
+    } | string | null;
     onVisit: (state: Readonly<PlayerSave.PlayerSaveState>) => PlayerSave.PlayerSaveState;
 }
 export class DialogNode{
     private parentNode : DialogNode;
     get parent(): DialogNode {return this.parent;}
-    private data : DialogOption;
+    readonly data : DialogOption;
     constructor(opts : DialogOption){
         this.data = opts;
         for(let key in this.data.children){
@@ -29,16 +30,20 @@ export class DialogNode{
         return node;
     } 
     resolveChoices(state: PlayerSave.PlayerSaveState) : {
-        readonly [key: string] : DialogNode
+        readonly [key: string] : DialogNode | null
     }{
         let data = this.data.choices(state);
-        if(typeof data === "string"){
+        if(data == null){
+            return{
+                "==>" : null
+            }
+        }else if(typeof data === "string"){
             return {
                 "==>" : this.navigate(data)
             }
         }else{
             let result : {
-                [key: string] : DialogNode
+                [key: string] : DialogNode | undefined | null
             } = {};
             for(let key in data){
                 result[key] = this.navigate(key);
@@ -46,7 +51,10 @@ export class DialogNode{
             return result;
         }
     }
-    navigate(path:string){
+    navigate(path:string) : DialogNode | null{
+        if(path.startsWith("root:://")){
+            return DialogRoot.navigate(path);
+        }
         const onlyDots = (testBit : string) => /\.+$/.test(testBit);
         let bits : string[] = path.split("/");
         let current : DialogNode = this;
@@ -68,14 +76,21 @@ export class DialogNode{
         }
         return current;
     }
+    renderDialogNode(context : PlayerSave.PlayerSaveState) : RenderedDialogNode {
+        return {
+            choices: this.resolveChoices(context),
+            title: this.data.title,
+            messages: this.data.messages(context)
+        }
+    }
 }
 
 export interface RenderedDialogNode {
     readonly choices : {
-        readonly [key: string] : DialogNode
+        readonly [key: string] : DialogNode | null
     }
     readonly title: string;
-    readonly messages : [Message];
+    readonly messages : Message[];
 }
 
 export interface Message {
