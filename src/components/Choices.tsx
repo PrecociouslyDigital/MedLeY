@@ -1,29 +1,29 @@
 import * as React from 'react';
-import store from '../store/store';
-import {SELECT_DIALOG} from '../actions/dialogActions';
 export interface ChoicesProps{
-    choices:{
-        [key : string] : string;
-    };
+    choices:string[];
+    //TODO: Horrible, horrible name
+    boundCallback:(path:string)=>null;
 }
 
-const ChoiceOption : React.PureComponent<{target: string}> = ({target})=>(
-    <p className='choice' onClick={store.dispatch({
-        type: SELECT_DIALOG,
-        path:target
-    })}>
-       {target}
-    </p>
-)
-export class Choices extends React.Component <ChoicesProps>{
+export const ChoiceOption : (props:{target: string, choiceCallback:(choice:string)}) => JSX.Element = ({target, choiceCallback}) =>
+    (<p className='choice' onClick={()=>choiceCallback(target)}>
+        {target}
+    </p>);
+
+export default class Choices extends React.Component <ChoicesProps>{
 
     public render() {
         return (
             <div className='dialogBox'>
                 {this.props.children}
-                
+
+                {this.props.choices.map(
+                    (choice)=>
+                    <ChoiceOption 
+                        target={choice} 
+                        choiceCallback={this.props.boundCallback}
+                    />)}
             </div>
         );
     }
-    public get
 }

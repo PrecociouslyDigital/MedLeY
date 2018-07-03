@@ -3,7 +3,7 @@ import Typist from 'react-typist';
 import PropTypes from 'prop-types';
 
 //TODO: Add backspacing
-class DialogLog extends React.Component <{
+export default class DialogLog extends React.Component <{
     onFinish?: PropTypes.func,
 },{
     typing:boolean,
@@ -36,9 +36,3 @@ class DialogLog extends React.Component <{
         );
     }
 }
-
-
-
-
-
-export default DialogLog;

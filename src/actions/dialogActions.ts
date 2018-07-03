@@ -11,6 +11,11 @@ export interface Select_Dialog{
     path : string;
 }
 
+export const moveDialogAction = (path)=> {
+    type : SELECT_DIALOG;
+    path : path;
+}
+
 export const moveDialogReducer = (state: StoreState, action: Select_Dialog) : StoreState => {
     let nextNode : Dialog.DialogNode | null;
     if(state.currentConversation!=null){
