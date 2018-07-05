@@ -1,5 +1,5 @@
 import {DialogNode} from './dialogHelpers';
-import * as PlayerSave from '../reducers/playerSave';
+import * as PlayerSave from '../actions/playerSave';
 import * as React from 'react';
 
 export interface DialogOptionTree {
@@ -16,7 +16,7 @@ const byePlayer = new DialogNode({
     children : {},
     choices : ()=>null
 });
-export default const dialogRoot : DialogOptionTree  = {
+export const dialogRoot : DialogOptionTree  = {
     "testing":{
         "counter": new DialogNode({
             title: "I'm a testing npc",
@@ -65,7 +65,7 @@ export default const dialogRoot : DialogOptionTree  = {
                     }),
                     children:{}
                 }),
-                "regreet" : new DialogNode({
+                "creepy" : new DialogNode({
                     title: "I'm a testing npc",
                     messages: () => [{
                         message: "It's really creepy how you keep talking to me.",
@@ -84,7 +84,7 @@ export default const dialogRoot : DialogOptionTree  = {
             choices: (state: PlayerSave.PlayerSaveState) => {
                 if(state.timesTalked == 1){
                     return "./greet";
-                }else if(state.timesTalked > 10){
+                }else if(state.timesTalked > 4){
                     return "./creepy";
                 }else{
                     return "./regreet";
@@ -97,7 +97,7 @@ export default const dialogRoot : DialogOptionTree  = {
 }
 
 
-const errorNode = new DialogNode({
+const errorNode = (path:string) => new DialogNode({
     title: "You done fucked up",
     messages : ()=> [
         {
@@ -120,23 +120,25 @@ const errorNode = new DialogNode({
     onVisit: (state) => state,
 });
 //Should be of form root://path.to.dialog.node.root/dialog/nodes/navigation
-export const navigate = (path:string) : DialogNode {
+export const navigate = (path:string) : DialogNode => {
     if(path.startsWith("root://")){
         let current : any  = dialogRoot;
         let bits = path.split("/",4);
-        bits.shift();
-        bits.shift(); //gets rid of root://
         for(let rootBit of (bits[2] || "").split(".")){
             //gets the dots path
-            current = current[rootBit] as DialogOptionTree;
+            if(rootBit !== ''){
+                current = current[rootBit] as DialogOptionTree;
+            }
             //not guarenteed but if this fucks up it should be reproed pretty easily.
         }
         // Look this is blatant abuse of typescript so if it breaks just slap me or smthn idc
         // I need to stop doing || null checks but it's so convinentttt
-        return (current as DialogNode).navigate(bits[3]) || errorNode;
+        if(bits.length==4)
+            return (current as DialogNode).navigate(bits[3]) || errorNode(path);
+        else
+            return current as DialogNode || errorNode(path);
     }else{
         console.error("Navigate failed! path was " + path);
-        return errorNode;
-
+        return errorNode(path);
     }
 }

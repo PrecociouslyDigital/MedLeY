@@ -1,4 +1,4 @@
-import * as PlayerSave from '../reducers/playerSave';
+import * as PlayerSave from '../actions/playerSave';
 import * as DialogRoot from '../dialogSystem/dialogRoot';
 
 
@@ -15,7 +15,7 @@ export interface DialogOption{
 }
 export class DialogNode{
     private parentNode : DialogNode;
-    get parent(): DialogNode {return this.parent;}
+    get parent(): DialogNode {return this.parentNode;}
     readonly data : DialogOption;
     constructor(opts : DialogOption){
         this.data = opts;
@@ -43,32 +43,32 @@ export class DialogNode{
             }
         }else{
             let result : {
-                [key: string] : DialogNode | undefined | null
+                [key: string] : DialogNode | null
             } = {};
             for(let key in data){
-                result[key] = this.navigate(key);
+                result[key] = this.navigate(data[key]);
             }
             return result;
         }
     }
     navigate(path:string) : DialogNode | null{
-        if(path.startsWith("root:://")){
+        if(path.startsWith("root://")){
             return DialogRoot.navigate(path);
         }
-        const onlyDots = (testBit : string) => /\.+$/.test(testBit);
+        const onlyDots = (testBit : string) => /^\.+$/.test(testBit);
         let bits : string[] = path.split("/");
         let current : DialogNode = this;
-        if(/\S/.test(bits[0])){
+        if(/^\s+$/.test(bits[0])){
             bits.shift();
             current = this.root;
         }
-        if(/\S/.test(bits[bits.length-1])){
+        if(bits.length > 1 && (/^\s+$/.test(bits[bits.length-1]) || bits[bits.length-1] === "")){
             bits.pop();
         }
         for(let bit of bits){
             if(onlyDots(bit)){
                 for(let i = 1; i < bit.length; i++){
-                    current = current.parent;
+                    current = current.parent || current;
                 }
             }else{
                 current = current.data.children[bit]

@@ -1,19 +1,22 @@
-import * as DialogHelpers from '../dialogSystem/dialogHelpers';
 import * as DialogActions from '../actions/dialogActions';
-import * as PlayerSave from '../reducers/playerSave';
-import { createStore } from 'redux';
+
+import * as UIState from '../actions/uiState';
+import { createStore, combineReducers } from 'redux';
 
 export interface StoreState {
-    currentConversation?: DialogHelpers.RenderedDialogNode;
-    playerState : PlayerSave.PlayerSaveState;
+    gameState : DialogActions.GameState;
+    uiState : UIState.UIState;
 }
 
-const coreReducer = (state: StoreState, action : DialogActions.Select_Dialog) : StoreState => {
-    return DialogActions.moveDialogReducer(state, action);
-}
-
-export default const store = createStore<StoreState, {type:string}, any, any>(coreReducer,{
-    playerState : {
-        timesTalked : 0
-    }
+const coreReducer = combineReducers({
+    gameState: DialogActions.moveDialogReducer,
+    uiState: UIState.UIReducer
 });
+
+
+const store = createStore<StoreState, {type:string}, any, any>(coreReducer,{
+    gameState: DialogActions.defaultGameState,
+    uiState : UIState.defaultUIState
+},window["__REDUX_DEVTOOLS_EXTENSION__"] && window["__REDUX_DEVTOOLS_EXTENSION__"]());
+
+export default store;
